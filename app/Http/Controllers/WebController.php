@@ -39,6 +39,8 @@ class WebController extends Controller
 
     public function blog()
     {
+        $posts = Post::orderBy('created_at', 'DESC')->get();
+
         $head = $this->seo->render(
             env('APP_NAME') . ' - Blog - escola',
             'Essa escola vai te levar para o proximo nivel',
@@ -46,8 +48,29 @@ class WebController extends Controller
             asset('images/img_bg_1.jpg')
         );
 
-        return view('front.blog', [ 'head'=>$head ]);
+        return view('front.blog', [
+            'head'=>$head,
+            'posts'=>$posts
+            ]);
     }
+
+    public function article($uri)
+    {
+        $post = Post::where('uri', $uri)->first();
+
+        $head = $this->seo->render(
+            env('APP_NAME') . $post->title,
+            $post->subtitle,
+            url('/blog/'. $uri),
+            asset(\App\Support\Cropper::thumb($post->cover, 800, 450))
+        );
+
+        return view('front.article', [
+            'head'=>$head,
+            'post'=>$post
+            ]);
+    }
+
 
     public function contact()
     {
